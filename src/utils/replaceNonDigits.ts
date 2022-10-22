@@ -1,0 +1,1 @@
+export const replaceNonDigits = (str: string) => str.replace(/\D/g, '',)
