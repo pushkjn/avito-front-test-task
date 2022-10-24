@@ -9,6 +9,7 @@ export type Story = {
     type: 'job' | 'story' | 'comment' | 'poll' | 'pollopt'
     url: string
     kids?: number[]
+    score: number
 }
 
 export type Comment = {

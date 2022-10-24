@@ -35,7 +35,7 @@ export const StoryPage: React.FC = () => {
         <Stack spacing={2}>
             <Stack
                 direction="row"
-                justifyContent="space-between" 
+                justifyContent="space-between"
                 spacing={5}
                 alignItems="center"
             >
@@ -63,6 +63,9 @@ export const StoryPage: React.FC = () => {
                     {formatSecondsToDateString(data.time)}
                 </div>
             </Stack>
+            <div>
+                score: {data.score}
+            </div>
             <Button
                 sx={{
                     width: '30%',
