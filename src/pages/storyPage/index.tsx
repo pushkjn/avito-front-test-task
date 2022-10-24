@@ -16,7 +16,10 @@ export type storyParams = {
 export const StoryPage: React.FC = () => {
     const { id } = useParams<storyParams>()
 
-    const { data, isLoading, refetch, isFetching } = useGetStoryByIdQuery(+replaceNonDigits(id))
+    const { data, isLoading, refetch, isFetching, error } = useGetStoryByIdQuery(+replaceNonDigits(id))
+
+    if (error)
+        return <div>An error occured while trying to make a request, please try again later</div>
 
     if (isLoading)
         return <CircularProgress />

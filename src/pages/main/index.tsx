@@ -1,37 +1,40 @@
-import { Alert, Button, CircularProgress, Skeleton, Snackbar } from "@mui/material";
+import { Alert, Button, Skeleton, Snackbar } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { StoryCard } from "../../components/storyCard";
 import { useInterval } from "../../hooks/useInterval";
-import { useGetStoriesQuery, useLazyGetLatestQuery } from "../../store/api";
+import { useLazyGetStoriesQuery } from "../../store/api";
 import { STORIES_AMOUNT, UPDATE_NEWS_INTERVAL } from "./config";
 
 export const Main: React.FC = () => {
-    const [getLatestStories, latestStoriesResponce] = useLazyGetLatestQuery()
     const [upToDate, setUpToDate] = useState(false)
-    const { data: stories, isLoading: storiesLoading, error: getStoriesError } = useGetStoriesQuery(latestStoriesResponce.data?.slice(0, STORIES_AMOUNT), { skip: !latestStoriesResponce.data })
+    const [getStories, stories] = useLazyGetStoriesQuery()
 
     useEffect(() => {
-        getLatestStories()
+        getStories(STORIES_AMOUNT)
     }, [])
+    /* useEffect(() => {
+        getLatestStories()
+    }, []) */
 
-    useInterval(() => getLatestStories(), UPDATE_NEWS_INTERVAL)
+    useInterval(() => getStories(STORIES_AMOUNT), UPDATE_NEWS_INTERVAL)
 
     const handleRefetch = async (showMessage?: boolean) => {
-        const oldFirst = latestStoriesResponce.data[0]
+        const oldFirst = stories.data[0].id
 
-        const responce = await getLatestStories()
+        const responce = await getStories(STORIES_AMOUNT)
 
         if (!showMessage)
             return
 
-        if (responce.data[0] == oldFirst)
+        if (responce.data[0].id == oldFirst)
             setUpToDate(true)
     }
 
     const renderStories = () => {
-        if (!stories || !latestStoriesResponce.data || storiesLoading)
-            return Array(STORIES_AMOUNT / 2).fill(null).map(() => (
+        if (!stories.data || stories.isLoading || stories.isFetching)
+            return Array(STORIES_AMOUNT / 2).fill(null).map((_, idx) => (
                 <Skeleton
+                    key={idx}
                     sx={{
                         height: '5rem'
                     }}
@@ -39,19 +42,14 @@ export const Main: React.FC = () => {
             ))
 
         const indexIsEven = (idx: number) => idx % 2 === 0
-
+        console.log(stories.data, 'data')
         return (
-            [...stories]
-                .sort((a, b) => a.time - b.time)
+            [...stories.data]
+                .sort((a, b) => b.time - a.time)
                 .map((story, idx) => (
                     <StoryCard story={story} key={story.id} colored={indexIsEven(idx)} />
                 ))
         )
-    }
-
-    const displayLoading = () => {
-        if ((latestStoriesResponce.isLoading) || (latestStoriesResponce.isFetching))
-            return <CircularProgress sx={{ margin: '0 auto 1rem', display: 'block' }} />
     }
 
     const displaySnackBars = () => (
@@ -61,7 +59,7 @@ export const Main: React.FC = () => {
                     vertical: 'top',
                     horizontal: 'right'
                 }}
-                open={Boolean((latestStoriesResponce.error || getStoriesError))}
+                open={stories.isError}
                 autoHideDuration={3000}
             >
                 <Alert severity="error">
@@ -100,8 +98,6 @@ export const Main: React.FC = () => {
             >
                 Update
             </Button>
-
-            {displayLoading()}
 
             {renderStories()}
 

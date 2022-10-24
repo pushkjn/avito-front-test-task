@@ -7,7 +7,6 @@ import { Provider } from 'react-redux'
 import { store } from './store/store'
 import { Container, CssBaseline, ThemeProvider } from '@mui/material'
 import { theme } from "./theme"
-import { useLazyGetLatestQuery } from './store/api'
 import { Header } from './components/header'
 
 

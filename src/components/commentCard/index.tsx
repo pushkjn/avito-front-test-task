@@ -2,7 +2,7 @@ import Button from "@mui/material/Button/Button";
 import Skeleton from "@mui/material/Skeleton/Skeleton";
 import Box from "@mui/material/Box";
 import React, { useState } from "react"
-import { storiesApi, useGetCommentByIdQuery } from "../../store/api"
+import { useGetCommentsByIdQuery } from "../../store/api"
 
 export type CommentProps = {
     id: number
@@ -10,7 +10,7 @@ export type CommentProps = {
 }
 
 export const CommentCard: React.FC<CommentProps> = props => {
-    const { data, isLoading } = useGetCommentByIdQuery(props.id)
+    const { data, isLoading } = useGetCommentsByIdQuery(props.id)
     const [opened, setOpened] = useState(false)
 
     const offset = (props.level ? props.level : 0) * 30

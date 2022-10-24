@@ -5,25 +5,27 @@ export const storiesApi = createApi({
     reducerPath: 'storiesApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'https://hacker-news.firebaseio.com/v0' }),
     endpoints: (builder) => ({
-        getLatest: builder.query<number[], void>({
-            query: () => '/newstories.json'
-        }),
         getStoryById: builder.query<Story, number>({
             query: (id) => `/item/${id}.json`
         }),
-        getCommentById: builder.query<Comment, number>({
+        getCommentsById: builder.query<Comment, number>({
             query: (id) => `/item/${id}.json`
         }),
-        getStories: builder.query<Story[], number[]>({
-            async queryFn(storiesIds, _queryApi, _extraOptions, fetchWithBQ) {
-                const requests = storiesIds.map(id => fetchWithBQ(`/item/${id}.json`))
+        getStories: builder.query<Story[], number>({
+            async queryFn(storiesAmount, _queryApi, _extraOptions, fetchWithBQ) {
+
+                const ids = await fetchWithBQ('/newstories.json')
+                if (ids.error)
+                    return { error: ids.error as FetchBaseQueryError }
+
+                const requests = (ids.data as number[]).slice(0, storiesAmount).map(id => fetchWithBQ(`/item/${id}.json`))
 
                 const stories = (await Promise.all(requests)).map(el => el.data as Story)
 
-                return { data: stories }
+                return { data: stories.filter(story => story !== null) }
             }
         })
     }),
 })
 
-export const { useGetCommentByIdQuery, useLazyGetLatestQuery, useGetStoryByIdQuery, useLazyGetStoryByIdQuery, useGetStoriesQuery } = storiesApi
+export const { useGetCommentsByIdQuery, useGetStoryByIdQuery, useGetStoriesQuery, useLazyGetStoriesQuery } = storiesApi
