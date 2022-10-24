@@ -1,8 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 
-module.exports = (env, argv) => {
-    const isDevelopment = !(argv.mode == 'production')
+module.exports = () => {
     return ({
         entry: './src/index.tsx',
         output: {
@@ -27,12 +26,13 @@ module.exports = (env, argv) => {
                 }
             ]
         },
-        mode: isDevelopment ? 'development' : 'production',
+        mode: 'development',
         resolve: {
             extensions: [ '.js', '.ts', '.tsx' ]
         },
         devServer: {
-            historyApiFallback: true
+            historyApiFallback: true,
+            port: 3000
         },
         plugins: [
             new HtmlWebpackPlugin({

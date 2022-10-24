@@ -1,32 +1,34 @@
-import { Skeleton } from "@mui/material";
-import Box from "@mui/material/Box";
 import React from "react";
+import Button from "@mui/material/Button/Button";
+import Typography from "@mui/material/Typography/Typography";
+import Stack from "@mui/material/Stack/Stack";
 import { Link } from "react-router-dom";
-import { useGetStoryByIdQuery } from "../../store/api";
+import { Story } from "../../type"
 
-export const StoryCard: React.FC<{ id: number }> = props => {
-    const { data, isLoading } = useGetStoryByIdQuery(props.id)
-
-    if (isLoading)
-        return (
-            <Skeleton
-                sx={{
-                    marginBottom: '1rem'
-                }}
-                variant="rectangular"
-                width={210}
-                height="1rem"
-            />
-        )
-
-    return (
-        <Box sx={{
-            marginBottom: '1rem'
-        }}>
-            {data?.title}
-            <Link to={`/story/id=${props.id}`}>
-                go to story page
-            </Link>
-        </Box>
-    )
+export type StoryCardProps = {
+    story: Story
+    colored?: boolean
 }
+
+export const StoryCard: React.FC<StoryCardProps> = props => (
+    <Stack
+        justifyContent="space-between"
+        direction="row"
+        alignItems="center"
+        sx={{
+            marginBottom: '1rem',
+            backgroundColor: props.colored ? 'primary.light' : 'none',
+            padding: '1rem'
+        }}
+    >
+        <Typography variant="body1">
+            {props.story.title}
+        </Typography>
+        <Button
+            component={Link}
+            to={`/story/${props.story.id}`}
+        >
+            go to story page
+        </Button>
+    </Stack>
+)

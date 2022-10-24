@@ -1,2 +1,2 @@
-export const UPDATE_NEWS_INTERVAL = 5000
+export const UPDATE_NEWS_INTERVAL = 60_000
 export const STORIES_AMOUNT = 100

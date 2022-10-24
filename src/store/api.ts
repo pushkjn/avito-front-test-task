@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/query/react'
 import { Story, Comment } from '../type'
 
 export const storiesApi = createApi({
@@ -13,8 +13,19 @@ export const storiesApi = createApi({
         }),
         getCommentById: builder.query<Comment, number>({
             query: (id) => `/item/${id}.json`
+        }),
+        getStories: builder.query<Story[], number[]>({
+            async queryFn(storiesIds, _queryApi, _extraOptions, fetchWithBQ) {
+                let stories: Story[] = []
+
+                const requests = storiesIds.map(id => fetchWithBQ(`/item/${id}.json`))
+
+                stories = (await Promise.all(requests)).map(el => el.data as Story)
+
+                return { data: stories }
+            }
         })
     }),
 })
 
-export const { useGetStoryByIdQuery, useGetCommentByIdQuery, useLazyGetLatestQuery } = storiesApi
+export const { useGetCommentByIdQuery, useLazyGetLatestQuery, useGetStoryByIdQuery, useLazyGetStoryByIdQuery, useGetStoriesQuery } = storiesApi

@@ -1,9 +1,13 @@
-import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useStory } from "../../hooks/useStory";
+import React from "react";
+import { Link, useParams } from "react-router-dom";
 import { useGetStoryByIdQuery } from "../../store/api";
 import { replaceNonDigits } from "../../utils/replaceNonDigits";
 import { CommentCard } from "../../components/commentCard";
+import Button from "@mui/material/Button/Button";
+import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import Stack from "@mui/material/Stack/Stack";
+import Typography from "@mui/material/Typography/Typography";
+import { formatSecondsToDateString } from "../../utils/formatting";
 
 export type storyParams = {
     id: string
@@ -12,20 +16,15 @@ export type storyParams = {
 export const StoryPage: React.FC = () => {
     const { id } = useParams<storyParams>()
 
-    const { data, isLoading } = useGetStoryByIdQuery(+replaceNonDigits(id))
+    const { data, isLoading, refetch, isFetching } = useGetStoryByIdQuery(+replaceNonDigits(id))
 
     if (isLoading)
-        return (
-            <div>
-                loading
-            </div>
-        )
-
-    let date = new Date(0)
-
-    date.setUTCSeconds(data.time)
+        return <CircularProgress />
 
     const renderComments = () => {
+        if (isFetching)
+            return <CircularProgress />
+
         if (!data.kids)
             return null
 
@@ -33,20 +32,66 @@ export const StoryPage: React.FC = () => {
     }
 
     return (
-        <div>
-            <div>story: {data.title} </div>
-            <div>
-                autor: {data.by}
-            </div>
-            <div>
-                date: {date.toDateString()} 
-            </div>
-            <div>
-                comments: {data.descendants}
-            </div>
+        <Stack spacing={2}>
+            <Stack
+                direction="row"
+                justifyContent="space-between" 
+                spacing={5}
+                alignItems="center"
+            >
+                <Typography variant="caption">
+                    {data.title}
+                </Typography>
+
+                <Button
+                    component={Link}
+                    to="/"
+                    variant="outlined"
+                >
+                    Back to main
+                </Button>
+            </Stack>
+
+            <Stack
+                justifyContent="space-between"
+                direction="row"
+            >
+                <div>
+                    by: {data.by}
+                </div>
+                <div>
+                    {formatSecondsToDateString(data.time)}
+                </div>
+            </Stack>
+            <Button
+                sx={{
+                    width: '30%',
+                    backgroundColor: 'primary.main'
+                }}
+                variant='contained'
+                href={data.url}
+                target="_blank"
+            >
+                source
+            </Button>
+            <Stack spacing={2}>
+                <div>
+                    comments: {data.descendants}
+                </div>
+                <Button
+                    onClick={refetch}
+                    variant="outlined"
+                    sx={{
+                        width: '30%'
+                    }}
+                >
+                    Refresh comments
+                </Button>
+            </Stack>
+
             <div>
                 {renderComments()}
             </div>
-        </div>
+        </Stack>
     )
 }
