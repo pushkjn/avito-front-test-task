@@ -42,7 +42,7 @@ export const Main: React.FC = () => {
             ))
 
         const indexIsEven = (idx: number) => idx % 2 === 0
-        console.log(stories.data, 'data')
+        
         return (
             [...stories.data]
                 .sort((a, b) => b.time - a.time)
